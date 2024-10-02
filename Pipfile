@@ -8,6 +8,8 @@ django = "*"
 djlint = "*"
 django-debug-toolbar = "*"
 djangorestframework = "*"
+pymysql = "*"
+psycopg2-binary = "*"
 
 [dev-packages]
 
