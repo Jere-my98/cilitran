@@ -1,0 +1,1 @@
+# Migrations Folder is for generating the database tables
