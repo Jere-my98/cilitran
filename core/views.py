@@ -1,23 +1,56 @@
-from rest_framework import viewsets
-from rest_framework.permissions import IsAuthenticatedOrReadOnly, IsAuthenticated
-from .models import Place, Hotel, Review
-from .serializers import PlaceSerializer, HotelSerializer, ReviewSerializer
-from .permissions import IsReviewAuthor  # Import your custom permission
+from django_filters.rest_framework import DjangoFilterBackend
+from rest_framework import viewsets, filters
+from rest_framework.permissions import IsAuthenticatedOrReadOnly, IsAdminUser, AllowAny
+from .models import Place, Hotel, Review, User
+from .serializers import PlaceSerializer, HotelSerializer, ReviewSerializer, UserSerializer
+from .permissions import IsOwnerOrAdmin,IsSelfOrAdmin  # Import custom permission
 
 class PlaceViewSet(viewsets.ModelViewSet):
     queryset = Place.objects.all()
     serializer_class = PlaceSerializer
+    filter_backends = (DjangoFilterBackend, filters.OrderingFilter)
+    filterset_fields = ['name', 'country']
     permission_classes = [IsAuthenticatedOrReadOnly]  # Allow unauthenticated users to read
+
+    def get_permissions(self):
+        if self.action in ['create', 'update', 'partial_update', 'destroy']:
+            self.permission_classes = [IsAdminUser]
+        else:
+            self.permission_classes = [AllowAny]
+        return super().get_permissions()
+
 
 class HotelViewSet(viewsets.ModelViewSet):
     queryset = Hotel.objects.all()
     serializer_class = HotelSerializer
+    filter_backends = (DjangoFilterBackend, filters.OrderingFilter)
+    filterset_fields = ['name', 'place','rating']
     permission_classes = [IsAuthenticatedOrReadOnly]  # Allow unauthenticated users to read
 
+    def get_permissions(self):
+        if self.action in ['create', 'update','partial_update','destroy']:
+            self.permission_classes = [IsAdminUser]
+        else:
+            self.permission_classes = [AllowAny]
+        return super().get_permissions()
+
+class UserViewSet(viewsets.ModelViewSet):
+    queryset = User.objects.all()
+    serializer_class = UserSerializer
+
+    def get_permissions(self):
+        if self.action in ['create', 'update', 'partial_update', 'destroy']:
+            self.permission_classes = [IsSelfOrAdmin]
+        else:
+            self.permission_classes = [AllowAny]
+        return super().get_permissions()
+
 class ReviewViewSet(viewsets.ModelViewSet):
-    queryset = Review.objects.all()
+    queryset = Review.objects.select_related('user','hotel').all()
     serializer_class = ReviewSerializer
     permission_classes = [IsAuthenticatedOrReadOnly]  # Allow unauthenticated users to read
+    filter_backends = (DjangoFilterBackend, filters.OrderingFilter)
+    filterset_fields = ['hotel']
 
     def perform_create(self, serializer):
         # Assign the user who created the review
@@ -25,8 +58,12 @@ class ReviewViewSet(viewsets.ModelViewSet):
 
     def get_permissions(self):
         # Custom permissions for update and delete actions
-        if self.request.method in ['PUT', 'PATCH', 'DELETE']:
-            self.permission_classes = [IsAuthenticated, IsReviewAuthor]  # Only authors can update or delete
+        if self.action in ['update','partial_update','destroy']:
+            self.permission_classes = [IsOwnerOrAdmin]
+        elif self.action == 'create':
+            self.permission_classes = [IsAuthenticatedOrReadOnly]
+        else:
+            self.permission_classes = [AllowAny]
         return super().get_permissions()
 
     def get_queryset(self):

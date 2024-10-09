@@ -1,15 +1,16 @@
-from rest_framework import permissions
+from rest_framework.permissions import BasePermission
 
-class IsReviewAuthor(permissions.BasePermission):
+class IsOwnerOrAdmin(BasePermission):
     """
-    Custom permission to only allow the author of a review to edit or delete it.
+    Custom permission to only allow the owner of the review or an admin to edit or delete it.
     """
-
     def has_object_permission(self, request, view, obj):
-        # Read permissions are allowed to any request,
-        # so we'll always allow GET, HEAD, or OPTIONS requests.
-        if request.method in permissions.SAFE_METHODS:
-            return True
+        # Allow admin users or the user who wrote the review to edit or delete
+        return obj.user == request.user or request.user.is_staff
 
-        # Write permissions are only allowed to the author of the review.
-        return obj.user == request.user
+class IsSelfOrAdmin(BasePermission):
+    """
+    Custom permission to allow users to edit their own profile or admins to edit any profile.
+    """
+    def has_object_permission(self, request, view, obj):
+        return obj == request.user or request.user.is_staff

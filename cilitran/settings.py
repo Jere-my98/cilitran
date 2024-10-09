@@ -40,10 +40,12 @@ INSTALLED_APPS = [
     'django.contrib.contenttypes',
     'django.contrib.messages',# This used for displaying one-time notifications to the user
     'django.contrib.staticfiles',# For serving static files eg. images, CSS files
+    'django.contrib.sessions',
     
     #Third-Party Apps
     'rest_framework',
     'debug_toolbar',
+    'django_filters',
 
     # Create your own apps here
     'feedback',
@@ -55,7 +57,9 @@ REST_FRAMEWORK = {
     # or allow read-only access for unauthenticated users.
     'DEFAULT_PERMISSION_CLASSES': [
         'rest_framework.permissions.DjangoModelPermissionsOrAnonReadOnly'
-    ]
+    ],
+    'DEFAULT_PAGINATION_CLASS':'rest_framework.pagination.PageNumberPagination',
+    'PAGE_SIZE':5,
 }
 
 MIDDLEWARE = [
@@ -103,10 +107,11 @@ DATABASES = {
         'NAME': 'hotel',
         'USER': 'database_admin',
         'PASSWORD': '42700005049',
-        'HOST': 'localhost',
-        'PORT': '5432', # Default PostgreSQL port
+        'HOST': 'db',  # This should match the service name in docker-compose.yml
+        'PORT': '5432',
     }
 }
+
 
 
 # Password validation
