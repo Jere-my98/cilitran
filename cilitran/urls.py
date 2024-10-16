@@ -23,7 +23,9 @@ from debug_toolbar.toolbar import debug_toolbar_urls
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('feedback/', include('feedback.urls')),
-    path('core/', include('core.urls'))
+    path('core/', include('core.urls')),
+    path('auth/', include('djoser.urls')),  # Djoser endpoints
+    path('auth/', include('djoser.urls.jwt')),  # JWT authentication endpoints
 
 ] + debug_toolbar_urls()
 

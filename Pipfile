@@ -11,6 +11,8 @@ djangorestframework = "*"
 pymysql = "*"
 psycopg2-binary = "*"
 django-filter = "*"
+djoser = "*"
+djangorestframework-simplejwt = "*"
 
 [dev-packages]
 
