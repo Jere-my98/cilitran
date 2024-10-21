@@ -16,6 +16,17 @@ services:
     depends_on:
       - db
 
+  frontend:
+    build:
+      context: ./frontend
+    command: npm start
+    volumes:
+      - ./frontend:/frontend
+    ports:
+      - "3000:3000"  # Maps host port 3000 to container port 3000
+    depends_on:
+      - web
+
   db:
     image: postgres:13
     restart: always

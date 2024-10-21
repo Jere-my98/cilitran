@@ -2,10 +2,10 @@ from django.urls import reverse
 from django.shortcuts import redirect
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.response import Response
-from rest_framework import status,viewsets, filters
+from rest_framework import status,viewsets, filters, generics
 from rest_framework.permissions import IsAuthenticatedOrReadOnly, IsAdminUser, AllowAny, IsAuthenticated
 from .models import Place, Hotel, Review, User
-from .serializers import PlaceSerializer, HotelSerializer, ReviewSerializer, UserSerializer
+from .serializers import PlaceSerializer, HotelSerializer, ReviewSerializer, UserSerializer, UserProfileSerializer
 from .permissions import IsOwnerOrAdmin,IsSelfOrAdmin  # Import custom permission
 
 class PlaceViewSet(viewsets.ModelViewSet):
@@ -122,6 +122,21 @@ class UserViewSet(viewsets.ModelViewSet):
         instance = self.get_object()
         self.perform_destroy(instance)
         return Response(status=status.HTTP_204_NO_CONTENT)
+
+class UserProfileView(generics.RetrieveUpdateDestroyAPIView):
+    serializer_class = UserProfileSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_object(self):
+        # Return the current authenticated user
+        return self.request.user
+
+    def destroy(self, request, *args, **kwargs):
+        """Allow users to delete their own account."""
+        instance = self.get_object()
+        self.perform_destroy(instance)
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
 
 class ReviewViewSet(viewsets.ModelViewSet):
     queryset = Review.objects.select_related('user', 'hotel').all()  # Optimize with select_related

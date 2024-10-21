@@ -23,6 +23,10 @@ class UserSerializer(serializers.ModelSerializer):
         model = User
         fields = ['id', 'username', 'email', 'first_name', 'last_name']
 
+class UserProfileSerializer(UserSerializer):
+    class Meta(UserSerializer.Meta):
+        fields = [field for field in UserSerializer.Meta.fields if field != 'id']  # Exclude 'id'
+
 # Review Serializer
 class ReviewSerializer(serializers.ModelSerializer):
     user = serializers.StringRelatedField(read_only=True)  # Show username in reviews
