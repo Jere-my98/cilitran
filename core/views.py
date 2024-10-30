@@ -132,11 +132,11 @@ class UserProfileView(generics.RetrieveUpdateDestroyAPIView):
         return self.request.user
 
     def destroy(self, request, *args, **kwargs):
-        """Allow users to delete their own account."""
+        """Soft delete the user by setting is_deleted to True."""
         instance = self.get_object()
-        self.perform_destroy(instance)
+        instance.is_deleted = True  # Mark the user as deleted
+        instance.save()  # Save the change
         return Response(status=status.HTTP_204_NO_CONTENT)
-
 
 class ReviewViewSet(viewsets.ModelViewSet):
     queryset = Review.objects.select_related('user', 'hotel').all()  # Optimize with select_related

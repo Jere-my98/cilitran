@@ -39,8 +39,8 @@ INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
-    'django.contrib.messages',# This used for displaying one-time notifications to the user
-    'django.contrib.staticfiles',# For serving static files eg. images, CSS files
+    'django.contrib.messages',#displaying one-time notifications to the user
+    'django.contrib.staticfiles',#serving static files eg. images, CSS files
     'django.contrib.sessions',
     
     #Third-Party Apps
